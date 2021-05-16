@@ -220,6 +220,7 @@ function fetchURL(url)
     else
         love.graphics.setBackgroundColor(1,1,1)
     end
+    love.timer.sleep(0.2)
 end
 
 function love.load()
@@ -227,7 +228,7 @@ function love.load()
     font = love.graphics.newFont(12)
     font2 = love.graphics.newFont(18)
     font3 = love.graphics.newFont(24)
-    url='https://testausxml.pages.dev/index.xml'
+    url='https://testausserveri.github.io/testausbrowser/'
     history={}
     fetchURL(url)
 end
