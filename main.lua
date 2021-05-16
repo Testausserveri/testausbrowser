@@ -242,9 +242,13 @@ function love.keypressed(key, scancode)
     elseif key=="backspace" then
         url=url:sub(0,-2)
     elseif key=="left" then
-        table.remove(history,#history)
-        url=history[#history]
-        fetchURL(url)
+        if #history>1 then
+            table.remove(history,#history)
+            url=history[#history]
+            fetchURL(url)
+        end
+    elseif key=="v" and love.keyboard.isDown("lctrl") then
+        url=love.system.getClipboardText()
     end
 end
 

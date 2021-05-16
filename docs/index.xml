@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testausxml>
+    <päähine>
+        <otsikko>Portaali</otsikko>
+    </päähine>
+    <sisältö>
+        <linkkinappulat>
+            <nappula kohde="https://testausxml.pages.dev/index.xml">Testausserverin kotisivut</nappula>
+        </linkkinappulat>
+        <pienempiotsikko>Kiitos että käytät Testausselainta!</pienempiotsikko>
+        <tekstiä>
+            Portaaliin voidaan lisätä linkkejä tuetuille sivuille ilmoituksesta vaikkapa discordissa.
+        </tekstiä>
+    </sisältö>
+</testausxml>
