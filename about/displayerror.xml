@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testausxml>
+    <päähine>
+        <otsikko>Sivua ei pystytty näyttämään</otsikko>
+    </päähine>
+    <sisältö>
+        <tekstiä>
+            Selain ei tue kyseistä sivua. Varmista, että sivun tyyppi on xml ja se sisältää testausXML-standardin mukaista sisältöä.
+        </tekstiä>
+        <tekstiä>
+            Voit palata edelliselle sivulle käyttämällä vasenta nuolinäppäintä.
+        </tekstiä>
+    </sisältö>
+</testausxml>

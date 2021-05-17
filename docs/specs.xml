@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testausxml>
+    <päähine>
+        <otsikko>Spesifikaatio:</otsikko>
+    </päähine>
+    <sisältö>
+        <linkkinappulat>
+            <nappula kohde="https://testausserveri.github.io/testausbrowser/">Takaisin kotisivulle</nappula>
+        </linkkinappulat>
+        <tekstiä>
+            TestausXML-spesifikaatio muuttuu tarpeen mukaan, ja ominaisuuksia lisätään pyydettäessä ja tarvittaessa.
+        </tekstiä>
+        <otsikko>Kaikki tällä hetkellä tuetut kahvat ja niiden argumentit:</otsikko>
+        <pienempiotsikko>päähine</pienempiotsikko>
+        <tekstiä>
+            Luo dokumenttiin korostetun koko sivun levyisen palkin
+        </tekstiä>
+        <pienempiotsikko>linkkinappulat</pienempiotsikko>
+        <tekstiä>
+            Merkitsee ryhmitetyt linkit
+        </tekstiä>
+        <pienempiotsikko>sisältö</pienempiotsikko>
+        <tekstiä>
+            Merkitsee dokumentin tekstisisällön
+        </tekstiä>
+        <pienempiotsikko>tekstiä</pienempiotsikko>
+        <tekstiä>
+            Näyttää kappaleen tekstiä.
+        </tekstiä>
+        <pienempiotsikko>nappula</pienempiotsikko>
+        <tekstiä>
+            Tekee linkin.
+        </tekstiä>
+        <tekstiä>
+           kohde: URL johon linkki vie (pakollinen), avaaulkoisesti: Avataanko linkki ulkoisessa selaimessa (vaihtoehtoinen)
+        </tekstiä>
+        <pienempiotsikko>otsikko</pienempiotsikko>
+        <tekstiä>
+            Korostaa tekstin isoksi
+        </tekstiä>
+        <pienempiotsikko>pienempiotsikko</pienempiotsikko>
+        <tekstiä>
+            Korostaa tekstin isoksi, mutta otsikkoa pienemmäksi
+        </tekstiä>
+        <pienempiotsikko>kuva</pienempiotsikko>
+        <tekstiä>
+            Näyttää kuvan
+        </tekstiä>
+        <tekstiä>
+           lähde: täysi URL joka ohjaa kuvatiedostoon (pakollinen), leveys: kuvan leveys (vaihtoehtoinen), korkeus: kuvan korkeus (vaihtoehtoinen)
+        </tekstiä>
+    </sisältö>
+</testausxml>

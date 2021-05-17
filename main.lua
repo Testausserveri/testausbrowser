@@ -51,6 +51,26 @@ end
 
 renderers = {}
 
+renderers["kuva"] = function(content,element,o,prerender)
+    if not prerender then
+        love.graphics.setColor(1,1,1)
+        local url=element.xarg["lähde"]
+        if (cache[url]==nil) then
+            response = request.send(url)
+            local bytedata = love.data.newByteData(response.body)
+            local image = love.graphics.newImage(bytedata)
+            cache[url] = image
+        end
+        local image = cache[url]
+        local w = element.xarg.leveys or image:getWidth()
+        local h = element.xarg.korkeus or (image:getHeight()/image:getWidth())*w
+        love.graphics.draw(image,o.x,o.y,0,w/image:getWidth(),h/image:getHeight())
+        return o
+    else
+        return 0,0
+    end
+end
+
 renderers["päähine"] = function(content,element,o,prerender)
     if not prerender then
         local w,h=getDimensions(element,o)
@@ -116,8 +136,12 @@ renderers["nappula"] = function(content,element,o,prerender)
         if o.mx>o.x+o.ox and o.mx<o.x+o.ox+text:getWidth()+8 and o.my>o.y and o.my<o.y+text:getHeight()+8 then
             love.graphics.setColor(o.selectcolor)
             if o.md then
-                url=element.xarg.kohde
-                fetchURL(url)
+                if element.xarg.avaaulkoisesti then
+                    love.system.openURL(element.xarg.url)
+                else
+                    url=element.xarg.kohde
+                    fetchURL(url)
+                end
             end
         end
         love.graphics.rectangle('fill',o.x-4+o.ox,o.y-4,text:getWidth()+8,text:getHeight()+8)
@@ -175,6 +199,9 @@ function rendertestausxml(xml,options)
             if renderers[element.label] ~= nil then
                 merge=renderers[element.label](string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,options)
                 options=mergeoptions(options,merge)
+            else
+                merge=renderers["tekstiä"](string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,options)
+                options=mergeoptions(options,merge)
             end
         end
     end
@@ -211,14 +238,31 @@ function split(inputstr, sep)
 end
 
 function fetchURL(url)
-    table.insert(history,url)
-    response = request.send(url)
-    success, tree = pcall(collect,response.body)
-    if not success then
-        love.graphics.setBackgroundColor(1,0,0)
-        tree=nil
+    local success=true
+    if (string.find(url,"about/")~=1) then
+        table.insert(history,url)
+        response = request.send(url)
+        if not (response==false) then
+            success, tree = pcall(collect,response.body)
+            love.graphics.setBackgroundColor(1,1,1)
+        else
+            fetchURL("about/notfound")
+            love.graphics.setBackgroundColor(1,0,0)
+        end
+        if not success then
+            love.graphics.setBackgroundColor(1,0,0)
+            tree=nil
+            fetchURL("about/displayerror")
+            --love.system.openURL(url)
+        end
     else
-        love.graphics.setBackgroundColor(1,1,1)
+        page=love.filesystem.read(url..".xml")
+        success, tree = pcall(collect,page)
+        if not success then
+            love.graphics.setBackgroundColor(1,0,0)
+            tree=nil
+            fetchURL("about/displayerror")
+        end
     end
     love.timer.sleep(0.2)
 end
@@ -230,7 +274,9 @@ function love.load()
     font3 = love.graphics.newFont(24)
     url='https://testausserveri.github.io/testausbrowser/'
     history={}
+    cache={}
     fetchURL(url)
+    offset=0
 end
 
 function love.update(dt)
@@ -257,14 +303,20 @@ function love.textinput(t)
     url = url .. t
 end
 
+function love.wheelmoved( x, y )
+    offset=offset+((y^3)*10)
+    if offset>0 then offset=0 end
+end
 
 function love.draw()
+    love.graphics.translate(0,offset)
+    if tree then
+        render(tree)
+    end
+    love.graphics.origin()
     love.graphics.setColor(0.8,0.9,0.9)
     love.graphics.rectangle('fill',0,0,love.graphics.getWidth(),32)
     love.graphics.setColor(0,0,0)
     love.graphics.rectangle('line',0,0,love.graphics.getWidth(),32)
     love.graphics.print(url, 32, 8)
-    if tree then
-        render(tree)
-    end
 end
