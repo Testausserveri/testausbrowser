@@ -1,1 +1,1 @@
-love.exe .
+.\bin\love.exe .

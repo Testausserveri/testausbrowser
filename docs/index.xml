@@ -8,7 +8,7 @@
             <nappula kohde="https://testausxml.pages.dev/index.xml">Testausserverin kotisivut</nappula>
             <nappula kohde="https://testausserveri.github.io/testausbrowser/specs.xml">TestausXML-spesifikaatio</nappula>
         </linkkinappulat>
-        <pienempiotsikko>Kiitos että käytät Testausselainta!</pienempiotsikko>
+        <pienempiotsikko>Kiitos että käytät Testausbrowseria!</pienempiotsikko>
         <tekstiä>
             Portaaliin voidaan lisätä linkkejä tuetuille sivuille ilmoituksesta vaikkapa discordissa.
         </tekstiä>
