@@ -272,7 +272,7 @@ function love.load()
     font = love.graphics.newFont(12)
     font2 = love.graphics.newFont(18)
     font3 = love.graphics.newFont(24)
-    url='https://testausserveri.github.io/testausbrowser/'
+    url='https://testausserveri.github.io/testausbrowser/index.xml'
     history={}
     cache={}
     fetchURL(url)
