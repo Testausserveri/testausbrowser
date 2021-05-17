@@ -295,6 +295,7 @@ function love.load()
     cache={}
     fetchURL(url)
     offset=0
+    love.keyboard.setKeyRepeat(true)
 end
 
 function love.update(dt)
