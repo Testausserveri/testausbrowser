@@ -1,5 +1,20 @@
 request = require("luajit-request")
 
+function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 function parseargs(s)
     local arg = {}
     string.gsub(s, "([%-%wöäå]+)=([\"'])(.-)%2", function (w, _, a)
@@ -49,121 +64,131 @@ function collect(s)
     return stack[1]
 end
 
-renderers = {}
+rootdefaults = {
+    x=16,
+    y=32,
 
-renderers["kuva"] = function(content,element,o,prerender)
-    if not prerender then
-        love.graphics.setColor(1,1,1)
-        local url=element.xarg["lähde"]
-        if (cache[url]==nil) then
-            response = request.send(url)
-            local bytedata = love.data.newByteData(response.body)
-            local image = love.graphics.newImage(bytedata)
-            cache[url] = image
-        end
-        local image = cache[url]
-        local w = element.xarg.leveys or image:getWidth()
-        local h = element.xarg.korkeus or (image:getHeight()/image:getWidth())*w
-        love.graphics.draw(image,o.x,o.y,0,w/image:getWidth(),h/image:getHeight())
-        return o
-    else
-        local url=element.xarg["lähde"]
-        if (cache[url]==nil) then
-            response = request.send(url)
-            local bytedata = love.data.newByteData(response.body)
-            local image = love.graphics.newImage(bytedata)
-            cache[url] = image
-        end
-        local image = cache[url]
-        local w = element.xarg.leveys or image:getWidth()
-        local h = element.xarg.korkeus or (image:getHeight()/image:getWidth())*w
-        return w,h
-    end
-end
+    color = {0,0,0},
+    bgcolor = {1,1,1,0},
+    bordercolor = {0,0,0,0},
 
-renderers["päähine"] = function(content,element,o,prerender)
-    if not prerender then
-        local w,h=getDimensions(element,o)
-        love.graphics.setColor(o.bgcolor)
-        love.graphics.rectangle('fill',0,o.y,love.graphics.getWidth(),h)
-        o.y=o.y+8
-        return o
-    else
-        return 0,0
-    end
-end
+    font = "sans1",
+    align = "left",
+    padding = 0,
+    margin = 0,
+    ident = 0,
 
-renderers["otsikko"] = function(content,element,o,prerender)
-    text = love.graphics.newText(font3, content)
-    text:setf(content, love.graphics.getWidth()-o.x, "left")
+    direction = "down",
+    block = "both",
+}
 
-    if not prerender then
-        love.graphics.setColor(o.color)
-        love.graphics.draw(text,o.x,o.y)
-        o.y=o.y+text:getHeight()+16
-        return o
-    else
-        return text:getWidth(), text:getHeight()+16
-    end
-end
+defaults = {
+    tekstiä = {
+        font = "sans1",
+        margin = 16,
+        block = "both",
+    },
+    otsikko = {
+        font = "sans3",
+        margin = 16,
+        block = "both",
+    },
+    pienempiotsikko = {
+        font = "sans2",
+        margin = 16,
+        block = "both",
+    },
+    nappula = {
+        font = "sans1",
+        bordercolor = {0,0,0},
+        bgcolor = {0.9,0.9,0.9},
+        block = "both",
+        padding = 4,
+        selectcolor = {0.3,0.3,1},
+    },
+    linkkinappulat = {
+        direction = "right",
+        block = "vertical",
+    },
+    päähine = {
+        bgcolor = {0.9,0.9,0.9},
+        width = function(element) return love.graphics.getWidth() end,
+        x = 0,
+        ident = 16,
+    }
+}
 
-renderers["pienempiotsikko"] = function(content,element,o,prerender)
-    text = love.graphics.newText(font2, content)
-    text:setf(content, love.graphics.getWidth()-o.x, "left")
-
-    if not prerender then
-        love.graphics.setColor(o.color)
-        love.graphics.draw(text,o.x,o.y+text:getHeight())
-        o.y=o.y+text:getHeight()+16
-        return o
-    else
-        return text:getWidth(), text:getHeight()+16
-    end
-end
-
-renderers["tekstiä"] = function(content,element,o,prerender)
-    text = love.graphics.newText(font, content)
-    text:setf(content, love.graphics.getWidth()-o.x, "left")
-
-    if not prerender then
-        love.graphics.setColor(o.color)
-        love.graphics.draw(text,o.x,o.y+text:getHeight())
-
-        o.y=o.y+text:getHeight()+16
-        return o
-    else
-        return text:getWidth(), text:getHeight()
-    end
-end
-
-renderers["nappula"] = function(content,element,o,prerender)
-    o.ox=o.ox or 0
-    text = love.graphics.newText(font, content)
-    text:setf(content, love.graphics.getWidth()-o.x, "left")
-
-    if not prerender then
-        love.graphics.setColor(o.bgcolor)
-        if o.mx>o.x+o.ox and o.mx<o.x+o.ox+text:getWidth()+8 and o.my>o.y and o.my<o.y+text:getHeight()+8 then
-            love.graphics.setColor(o.selectcolor)
-            if o.md then
-                if element.xarg.avaaulkoisesti then
-                    love.system.openURL(element.xarg.kohde=="" and url or element.xarg.kohde)
-                else
-                    url=element.xarg.kohde=="" and url or element.xarg.kohde
-                    fetchURL(url)
-                end
+actions = {
+    nappula = function(element)
+        if element.xarg["kohde"] then
+            if element.xarg["avaaulkoisesti"] then
+                fetchURL(element.xarg["kohde"],true)
+            else
+                url=element.xarg["kohde"]
+                fetchURL(url)
             end
         end
-        love.graphics.rectangle('fill',o.x-4+o.ox,o.y-4,text:getWidth()+8,text:getHeight()+8)
-        love.graphics.setColor(o.color)
-        love.graphics.rectangle('line',o.x-4+o.ox,o.y-4,text:getWidth()+8,text:getHeight()+8)
-        love.graphics.draw(text,o.x+o.ox,o.y)
-
-        o.ox=o.ox+text:getWidth()+8
-        return o
-    else
-        return text:getWidth()+8,0
     end
+}
+
+function getDefaults(element)
+    local default = defaults[element.label] or {}
+    local processed = {}
+    for i,v in pairs(default) do
+        if type(v) == "function" then
+            processed[i] = v(element)
+        else
+            processed[i] = v
+        end
+    end
+    return processed
+end
+
+function renderElement(content,element,o,state)
+    table.insert(layers,love.graphics.newCanvas())
+    love.graphics.translate(0,offset)
+    love.graphics.setCanvas(layers[#layers])
+    local merge = getDefaults(element)
+    o = mergeoptions(o,merge)
+ 
+    local w,h=0,0
+    if content~="" then
+        text = love.graphics.newText(fonts[o.font], content)
+        text:setf(content, love.graphics.getWidth(), o.align)
+
+        w = o.width or math.min(love.graphics.getWidth()-o.x,text:getWidth()+o.ident)
+        text:setf(content, w, o.align)
+        h = o.height or text:getHeight()
+    else
+        w,h=o.width or love.graphics.getWidth()-o.x, o.height or 32
+    end
+    local mx,my=love.mouse.getPosition()
+    my=my+offset
+    love.graphics.setColor(o.bgcolor)
+    if (mx>o.x and mx<o.x+w+o.padding*3 and my>o.y and my<o.y+h+o.padding*3) then
+        if o.selectcolor then love.graphics.setColor(o.selectcolor) end
+        if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
+    end
+    love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
+    local img = o.image
+    if img then
+        love.graphics.setColor(1,1,1)
+        love.graphics.draw(o.image,o.x,o.y,0,w/img:getWidth(),h/img:getWidth())
+    end
+    love.graphics.setColor(o.bordercolor)
+    love.graphics.rectangle('line',o.x,o.y,w+o.padding*3,h+o.padding*3)
+    love.graphics.setColor(o.color)
+    if content~="" then
+        love.graphics.draw(text,o.x+o.padding+o.ident,o.y+o.padding)
+    end
+    if (o.block=="vertical" or o.block=="both") and o.direction == "down" then
+        o.y=o.y+h+o.margin+(o.padding*3)
+    elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
+        o.x=o.x+w+o.margin+(o.padding*3)
+    end
+    love.graphics.setCanvas()
+    love.graphics.origin()
+    return o,w+o.margin+(o.padding*3),h+o.margin+(o.padding*3)
 end
 
 function mergeoptions(options,merge)
@@ -177,62 +202,38 @@ function mergeoptions(options,merge)
     return opt
 end
 
-function getDimensions(element,options)
-    local x,y=0,0
-    if type(element[1]) == "table" then
-        if renderers[element.label] ~= nil then
-            local ox,oy=renderers[element.label]("",element,options,true)
-            x,y=x+ox,y+oy
+function rendertestausxml(element,options)
+    local thisoptions = deepcopy(options)
+    if type(element[1])=="table" then
+        local childoptions = mergeoptions(thisoptions,getDefaults(element))
+        local mw,mh = 0,0
+        for index,element in ipairs(element) do
+            local merge, ow, oh = rendertestausxml(element,childoptions)
+            childoptions.x, childoptions.y = merge.x, merge.y
+            mw,mh=math.max(mw,ow),math.max(mh,oh)
         end
-        for k,v in pairs(element) do
-            ox,oy=getDimensions(v,options)
-            x,y=x+ox,y+oy
-        end
-    else
-        if renderers[element.label] ~= nil then
-            local ox,oy=renderers[element.label](string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,options,true)
-            x,y=x+ox,y+oy
-        end
+        local w,h=math.max(childoptions.x-options.x,mw), math.max(childoptions.y-options.y,mh)
+        local o = deepcopy(thisoptions)
+        o.width,o.height=w,h
+        local merge = renderElement("",element,o,"render")
+        thisoptions.y = h + thisoptions.y
+    elseif type(element[1])=="string" then
+        merge, width, height = renderElement(string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,thisoptions,"render")
+        thisoptions = mergeoptions(thisoptions,merge)
     end
-    return x,y
-end
-
-function rendertestausxml(xml,options)
-    for index,element in ipairs(xml) do
-        if type(element[1])=="table" then
-            if renderers[element.label] ~= nil then
-                merge=renderers[element.label]("",element,options)
-                options=mergeoptions(options,merge)
-            end
-            rendertestausxml(element,options)
-        elseif type(element[1])=="string" then
-            if renderers[element.label] ~= nil then
-                merge=renderers[element.label](string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,options)
-                options=mergeoptions(options,merge)
-            else
-                merge=renderers["tekstiä"](string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,options)
-                options=mergeoptions(options,merge)
-            end
-        end
-    end
+    return thisoptions, width, height
 end
 
 function render(tree)
+    layers={}
     for index,branch in ipairs(tree) do
         if branch.label=="testausxml" then
-            rendertestausxml(branch,{
-                x=16,
-                y=32,
-
-                color={0,0,0},
-                bgcolor={0.9,0.9,0.9},
-                selectcolor={0.3,0.3,1},
-
-                mx=love.mouse.getX(),
-                my=love.mouse.getY()-offset,
-                md=love.mouse.isDown(1)
-            })
+            rendertestausxml(branch,rootdefaults)
         end
+    end
+    love.graphics.setColor(1,1,1)
+    for i=#layers,1,-1 do
+        love.graphics.draw(layers[i])
     end
 end
 
@@ -247,49 +248,57 @@ function split(inputstr, sep)
     return t
 end
 
-function fetchURL(furl)
-    local success=true
-    if (string.find(furl,"command/")==1) then
-        if furl=="command/back" then
-            if #history>1 then
-                table.remove(history)
-                url=history[#history]
-                fetchURL(url)
-            end
-        end
-    elseif (string.find(furl,"about/")==1) then
-        page=love.filesystem.read(furl..".xml")
-        success, tree = pcall(collect,page)
-        if not success then
-            love.graphics.setBackgroundColor(1,0,0)
-            tree=nil
-            fetchURL("about/displayerror")
-        end
+function fetchURL(furl,external)
+    if furl=="" then furl=url end
+    if external then
+        love.system.openURL(furl)
     else
-        response = request.send(furl)
-        if not (response==false) then
-            success, tree = pcall(collect,response.body)
-            love.graphics.setBackgroundColor(1,1,1)
+        local success=true
+        if (string.find(furl,"command/")==1) then
+            if furl=="command/back" then
+                if #history>1 then
+                    table.remove(history)
+                    url=history[#history]
+                    fetchURL(url)
+                    table.remove(history)
+                end
+            end
+        elseif (string.find(furl,"about/")==1) then
+            page=love.filesystem.read(furl..".xml")
+            success, tree = pcall(collect,page)
+            if not success then
+                love.graphics.setBackgroundColor(1,0,0)
+                tree=nil
+                fetchURL("about/displayerror")
+            end
         else
-            fetchURL("about/notfound")
-            love.graphics.setBackgroundColor(1,0,0)
+            response = request.send(furl)
+            if not (response==false) then
+                success, tree = pcall(collect,response.body)
+                love.graphics.setBackgroundColor(1,1,1)
+            else
+                fetchURL("about/notfound")
+                love.graphics.setBackgroundColor(1,0,0)
+            end
+            if not success then
+                love.graphics.setBackgroundColor(1,0,0)
+                tree=nil
+                fetchURL("about/displayerror")
+                --love.system.openURL(url)
+            end
+            table.insert(history,furl)
+            love.timer.sleep(0.2)
         end
-        if not success then
-            love.graphics.setBackgroundColor(1,0,0)
-            tree=nil
-            fetchURL("about/displayerror")
-            --love.system.openURL(url)
-        end
-        table.insert(history,furl)
-        love.timer.sleep(0.2)
     end
 end
 
 function love.load()
     love.graphics.setBackgroundColor(1,1,1)
-    font = love.graphics.newFont(12)
-    font2 = love.graphics.newFont(18)
-    font3 = love.graphics.newFont(24)
+    fonts = {}
+    fonts["sans1"] = love.graphics.newFont(12)
+    fonts["sans2"] = love.graphics.newFont(18)
+    fonts["sans3"] = love.graphics.newFont(24)
+
     url='https://testausserveri.github.io/testausbrowser/index.xml'
     history={}
     cache={}
@@ -312,6 +321,7 @@ function love.keypressed(key, scancode)
             table.remove(history)
             url=history[#history]
             fetchURL(url)
+            table.remove(history)
         end
     elseif key=="v" and love.keyboard.isDown("lctrl") then
         url=love.system.getClipboardText()
@@ -328,11 +338,9 @@ function love.wheelmoved( x, y )
 end
 
 function love.draw()
-    love.graphics.translate(0,offset)
     if tree then
         render(tree)
     end
-    love.graphics.origin()
     love.graphics.setColor(0.8,0.9,0.9)
     love.graphics.rectangle('fill',0,0,love.graphics.getWidth(),32)
     love.graphics.setColor(0,0,0)
