@@ -67,7 +67,17 @@ renderers["kuva"] = function(content,element,o,prerender)
         love.graphics.draw(image,o.x,o.y,0,w/image:getWidth(),h/image:getHeight())
         return o
     else
-        return 0,0
+        local url=element.xarg["lähde"]
+        if (cache[url]==nil) then
+            response = request.send(url)
+            local bytedata = love.data.newByteData(response.body)
+            local image = love.graphics.newImage(bytedata)
+            cache[url] = image
+        end
+        local image = cache[url]
+        local w = element.xarg.leveys or image:getWidth()
+        local h = element.xarg.korkeus or (image:getHeight()/image:getWidth())*w
+        return w,h
     end
 end
 
@@ -137,9 +147,9 @@ renderers["nappula"] = function(content,element,o,prerender)
             love.graphics.setColor(o.selectcolor)
             if o.md then
                 if element.xarg.avaaulkoisesti then
-                    love.system.openURL(element.xarg.url)
+                    love.system.openURL(element.xarg.kohde=="" and url or element.xarg.kohde)
                 else
-                    url=element.xarg.kohde
+                    url=element.xarg.kohde=="" and url or element.xarg.kohde
                     fetchURL(url)
                 end
             end
@@ -219,7 +229,7 @@ function render(tree)
                 selectcolor={0.3,0.3,1},
 
                 mx=love.mouse.getX(),
-                my=love.mouse.getY(),
+                my=love.mouse.getY()-offset,
                 md=love.mouse.isDown(1)
             })
         end
@@ -237,11 +247,26 @@ function split(inputstr, sep)
     return t
 end
 
-function fetchURL(url)
+function fetchURL(furl)
     local success=true
-    if (string.find(url,"about/")~=1) then
-        table.insert(history,url)
-        response = request.send(url)
+    if (string.find(furl,"command/")==1) then
+        if furl=="command/back" then
+            if #history>1 then
+                table.remove(history)
+                url=history[#history]
+                fetchURL(url)
+            end
+        end
+    elseif (string.find(furl,"about/")==1) then
+        page=love.filesystem.read(furl..".xml")
+        success, tree = pcall(collect,page)
+        if not success then
+            love.graphics.setBackgroundColor(1,0,0)
+            tree=nil
+            fetchURL("about/displayerror")
+        end
+    else
+        response = request.send(furl)
         if not (response==false) then
             success, tree = pcall(collect,response.body)
             love.graphics.setBackgroundColor(1,1,1)
@@ -255,16 +280,9 @@ function fetchURL(url)
             fetchURL("about/displayerror")
             --love.system.openURL(url)
         end
-    else
-        page=love.filesystem.read(url..".xml")
-        success, tree = pcall(collect,page)
-        if not success then
-            love.graphics.setBackgroundColor(1,0,0)
-            tree=nil
-            fetchURL("about/displayerror")
-        end
+        table.insert(history,furl)
+        love.timer.sleep(0.2)
     end
-    love.timer.sleep(0.2)
 end
 
 function love.load()
@@ -290,7 +308,7 @@ function love.keypressed(key, scancode)
         url=url:sub(0,-2)
     elseif key=="left" then
         if #history>1 then
-            table.remove(history,#history)
+            table.remove(history)
             url=history[#history]
             fetchURL(url)
         end
@@ -304,7 +322,7 @@ function love.textinput(t)
 end
 
 function love.wheelmoved( x, y )
-    offset=offset+((y^3)*10)
+    offset=offset+(y*20)
     if offset>0 then offset=0 end
 end
 

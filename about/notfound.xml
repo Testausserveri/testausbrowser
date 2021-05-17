@@ -7,5 +7,6 @@
         <tekstiä>
             Sivua ei löytynyt. Tarkasta verkkoyhteys sekä mahdolliset oikeinkirjoitusvirheet osoitteessa.
         </tekstiä>
+        <nappula kohde="command/back">Takaisin</nappula>
     </sisältö>
 </testausxml>

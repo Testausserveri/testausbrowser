@@ -10,5 +10,6 @@
         <tekstiä>
             Voit palata edelliselle sivulle käyttämällä vasenta nuolinäppäintä.
         </tekstiä>
+        <nappula kohde="" avaaulkoisesti="">Avaa ulkoisella selaimella</nappula><nappula kohde="command/back">Takaisin</nappula>
     </sisältö>
 </testausxml>
