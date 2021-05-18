@@ -130,6 +130,10 @@ defaults = {
         width = function(element) return element.xarg["leveys"] end,
         height = function(element) return element.xarg["korkeus"] end,
         bordercolor = {0,0,0}
+    },
+    väli = {
+        height = function(element) return element.xarg["korkeus"] or 16 end,
+        block = "vertical"
     }
 }
 
@@ -161,7 +165,7 @@ end
 
 function renderElement(content,element,o,state)
     table.insert(layers,love.graphics.newCanvas())
-    love.graphics.translate(0,offset)
+    love.graphics.translate(0,-offset)
     love.graphics.setCanvas(layers[#layers])
     local merge = getDefaults(element)
     o = mergeoptions(o,merge)
@@ -242,9 +246,11 @@ end
 
 function render(tree)
     layers={}
+    contentheight=0
     for index,branch in ipairs(tree) do
         if branch.label=="testausxml" then
-            rendertestausxml(branch,rootdefaults)
+            local options = rendertestausxml(branch,rootdefaults)
+            contentheight=options.y
         end
     end
     love.graphics.setColor(1,1,1)
@@ -349,8 +355,9 @@ function love.textinput(t)
 end
 
 function love.wheelmoved( x, y )
-    offset=offset+(y*20)
-    if offset>0 then offset=0 end
+    offset=offset-(y*20)
+    if offset<0 then offset=0 end
+    if offset>contentheight-love.graphics.getHeight() then offset=math.max(contentheight-love.graphics.getHeight(),0) end
 end
 
 function love.draw()
@@ -362,4 +369,6 @@ function love.draw()
     love.graphics.setColor(0,0,0)
     love.graphics.rectangle('line',0,0,love.graphics.getWidth(),32)
     love.graphics.print(url, 32, 8)
+    love.graphics.setColor(0,0,0,0.5)
+    love.graphics.rectangle('fill', love.graphics.getWidth()-4,32,4,offset/(contentheight-love.graphics.getHeight())*(love.graphics.getHeight()-32))
 end

@@ -49,5 +49,12 @@
         <tekstiä>
            lähde: täysi URL joka ohjaa kuvatiedostoon (pakollinen), leveys: kuvan leveys (vaihtoehtoinen), korkeus: kuvan korkeus (vaihtoehtoinen)
         </tekstiä>
+        <pienempiotsikko>väli</pienempiotsikko>
+        <tekstiä>
+            Tuottaa sivulle tyhjän pystysuuntaisen tilan
+        </tekstiä>
+        <tekstiä>
+           korkeus: välin korkeus
+        </tekstiä>
     </sisältö>
 </testausxml>
