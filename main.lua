@@ -129,7 +129,6 @@ defaults = {
         end,
         width = function(element) return element.xarg["leveys"] end,
         height = function(element) return element.xarg["korkeus"] end,
-        bordercolor = {0,0,0}
     },
     väli = {
         height = function(element) return element.xarg["korkeus"] or 16 end,
@@ -347,6 +346,8 @@ function love.keypressed(key, scancode)
         end
     elseif key=="v" and love.keyboard.isDown("lctrl") then
         url=love.system.getClipboardText()
+    elseif key=="q" and love.keyboard.isDown("lctrl") then
+        love.event.quit()
     end
 end
 
