@@ -71,6 +71,7 @@ rootdefaults = {
     color = {0,0,0},
     bgcolor = {1,1,1,0},
     bordercolor = {0,0,0,0},
+    borderwidth=0,
 
     font = "sans1",
     align = "left",
@@ -115,6 +116,20 @@ defaults = {
         width = function(element) return love.graphics.getWidth() end,
         x = 0,
         ident = 16,
+    },
+    kuva = {
+        image = function(element)
+            if not cache[element.xarg["lähde"]] then
+                local response = request.send(element.xarg["lähde"])
+                local data = love.data.newByteData(response.body)
+                cache[element.xarg["lähde"]] = love.graphics.newImage(data)
+                print("yee")
+            end
+            return cache[element.xarg["lähde"]]
+        end,
+        width = function(element) return element.xarg["leveys"] end,
+        height = function(element) return element.xarg["korkeus"] end,
+        bordercolor = {0,0,0}
     }
 }
 
@@ -150,7 +165,7 @@ function renderElement(content,element,o,state)
     love.graphics.setCanvas(layers[#layers])
     local merge = getDefaults(element)
     o = mergeoptions(o,merge)
- 
+    local img = o.image
     local w,h=0,0
     if content~="" then
         text = love.graphics.newText(fonts[o.font], content)
@@ -160,7 +175,8 @@ function renderElement(content,element,o,state)
         text:setf(content, w, o.align)
         h = o.height or text:getHeight()
     else
-        w,h=o.width or love.graphics.getWidth()-o.x, o.height or 32
+        w = o.width or love.graphics.getWidth()-o.x
+        h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
     end
     local mx,my=love.mouse.getPosition()
     my=my+offset
@@ -170,12 +186,12 @@ function renderElement(content,element,o,state)
         if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
     end
     love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
-    local img = o.image
     if img then
         love.graphics.setColor(1,1,1)
-        love.graphics.draw(o.image,o.x,o.y,0,w/img:getWidth(),h/img:getWidth())
+        love.graphics.draw(o.image,o.x,o.y,0,(w+o.padding*3)/img:getWidth(),(h+o.padding*3)/img:getHeight())
     end
     love.graphics.setColor(o.bordercolor)
+    love.graphics.setLineWidth(o.borderwidth)
     love.graphics.rectangle('line',o.x,o.y,w+o.padding*3,h+o.padding*3)
     love.graphics.setColor(o.color)
     if content~="" then
@@ -210,15 +226,15 @@ function rendertestausxml(element,options)
         for index,element in ipairs(element) do
             local merge, ow, oh = rendertestausxml(element,childoptions)
             childoptions.x, childoptions.y = merge.x, merge.y
-            mw,mh=math.max(mw,ow),math.max(mh,oh)
+            mw,mh=math.max(mw,ow or 0),math.max(mh,oh or 0)
         end
         local w,h=math.max(childoptions.x-options.x,mw), math.max(childoptions.y-options.y,mh)
         local o = deepcopy(thisoptions)
         o.width,o.height=w,h
         local merge = renderElement("",element,o,"render")
         thisoptions.y = h + thisoptions.y
-    elseif type(element[1])=="string" then
-        merge, width, height = renderElement(string.gsub(element[1], '^%s*(.-)%s*$', '%1'),element,thisoptions,"render")
+    else
+        merge, width, height = renderElement(string.gsub(element[1] or "", '^%s*(.-)%s*$', '%1'),element,thisoptions,"render")
         thisoptions = mergeoptions(thisoptions,merge)
     end
     return thisoptions, width, height
