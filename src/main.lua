@@ -32,7 +32,6 @@ function fetchURL(furl,external)
             end
         elseif (string.find(furl,"about/")==1) then
             page=love.filesystem.read(furl..".xml")
-            print(page)
             success, tree = pcall(xml.collect,page)
             if not success then
                 love.graphics.setBackgroundColor(1,0,0)
@@ -51,7 +50,6 @@ function fetchURL(furl,external)
                 love.graphics.setBackgroundColor(1,0,0)
                 tree=nil
                 fetchURL("about/displayerror")
-                --love.system.openURL(url)
             end
             table.insert(history,furl)
             love.timer.sleep(0.2)
@@ -62,8 +60,8 @@ end
 function love.load()
     love.graphics.setBackgroundColor(1,1,1)
 
-    url='https://testausserveri.github.io/testausbrowser/index.xml'
-    history={}
+    url='about/home'
+    history={'about/home'}
     cache={}
     fetchURL(url)
     offset=0

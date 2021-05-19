@@ -5,7 +5,7 @@ fonts = {
 }
 
 rootdefaults = {
-    x=16,
+    x=0,
     y=32,
 
     color = {0,0,0},
@@ -73,6 +73,9 @@ defaults = {
     väli = {
         height = function(element) return element.xarg["korkeus"] or 16 end,
         block = "vertical"
+    },
+    sisältö = {
+        ident = 16
     }
 }
 

@@ -1,3 +1,44 @@
+function hextorgb(hex)
+    local rgb={}
+    for i=2,#hex,2 do
+        table.insert(rgb,tonumber(string.sub(hex,i,i+1),16)/255)
+    end
+    return rgb
+end
+
+function testhex(input)
+    if tostring(tonumber(input)) == input then
+        return tonumber(input)
+    elseif string.find(input, "^#[%da-fA-F]+$") then
+        return hextorgb(input)
+    else
+        return input
+    end
+end
+
+translations = {
+    x = "x",
+    y = "y",
+    leveys = "width",
+    korkeus = "height",
+
+    väri = "color",
+    tausta = "bgcolor",
+    reunaväri = "bordercolor",
+    korostusväri = "selectcolor",
+
+    reuna = "borderwidth",
+    sisennys = "ident",
+    keskitys = "align",
+    täyte = "padding",
+    väli = "margin",
+
+    fontti = "font",
+    suunta = "direction",
+    tila = "block",
+}
+
+
 function deepcopy(orig)
     local orig_type = type(orig)
     local copy
@@ -23,6 +64,13 @@ function getDefaults(element)
             processed[i] = v
         end
     end
+    if element.xarg then
+        for i,v in pairs(element.xarg) do
+            if translations[i] then
+                processed[translations[i]] = testhex(v)
+            end
+        end
+    end
     return processed
 end
 
@@ -34,41 +82,65 @@ function renderElement(content,element,o,state)
     o = mergeoptions(o,merge)
     local img = o.image
     local w,h=0,0
-    if content~="" then
-        text = love.graphics.newText(fonts[o.font], content)
-        text:setf(content, love.graphics.getWidth(), o.align)
+    xpcall(function()
+        assert(fonts[o.font]~=nil,"Invalid font")
+        if content~="" then
+            text = love.graphics.newText(fonts[o.font], content)
+            text:setf(content, love.graphics.getWidth(), o.align)
 
-        w = o.width or math.min(love.graphics.getWidth()-o.x,text:getWidth()+o.ident)
-        text:setf(content, w, o.align)
-        h = o.height or text:getHeight()
-    else
-        w = o.width or love.graphics.getWidth()-o.x
-        h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
-    end
-    local mx,my=love.mouse.getPosition()
-    my=my+offset
-    love.graphics.setColor(o.bgcolor)
-    if (mx>o.x and mx<o.x+w+o.padding*3 and my>o.y and my<o.y+h+o.padding*3) then
-        if o.selectcolor then love.graphics.setColor(o.selectcolor) end
-        if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
-    end
-    love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
-    if img then
+            w = o.width or math.min(love.graphics.getWidth()-o.x,text:getWidth()+o.ident)
+            text:setf(content, w, o.align)
+            h = o.height or text:getHeight()
+        else
+            w = o.width or love.graphics.getWidth()-o.x
+            h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
+        end
+        local mx,my=love.mouse.getPosition()
+        my=my+offset
+        assert(type(w)=="number","Invalid width")
+        assert(type(h)=="number","Invalid height")
+
+        assert(type(o.bgcolor)=="table","Invalid background color")
+        assert(type(o.color)=="table","Invalid text color")
+        assert(type(o.bordercolor)=="table","Invalid border color")
+        assert(type(o.ident)=="number","Invalid identation property")
+        assert(type(o.padding)=="number","Invalid padding property")
+        assert(type(o.margin)=="number","Invalid margin property")
+        assert(type(o.borderwidth)=="number","Invalid border property")
+
+        love.graphics.setColor(o.bgcolor)
+        if (mx>o.x and mx<o.x+w+o.padding*3 and my>o.y and my<o.y+h+o.padding*3) then
+            if o.selectcolor then love.graphics.setColor(o.selectcolor) end
+            if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
+        end
+        love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
+        if img then
+            love.graphics.setColor(1,1,1)
+            love.graphics.draw(o.image,o.x,o.y,0,(w+o.padding*3)/img:getWidth(),(h+o.padding*3)/img:getHeight())
+        end
+        love.graphics.setColor(o.bordercolor)
+        love.graphics.setLineWidth(o.borderwidth)
+        love.graphics.rectangle('line',o.x,o.y,w+o.padding*3,h+o.padding*3)
+        love.graphics.setColor(o.color)
+        if content~="" then
+            love.graphics.draw(text,o.x+o.padding+o.ident,o.y+o.padding)
+        end
+        if (o.block=="vertical" or o.block=="both") and o.direction == "down" then
+            o.y=o.y+h+o.margin+(o.padding*3)
+        elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
+            o.x=o.x+w+o.margin+(o.padding*3)
+        end
+    end, function(error)
+        text = love.graphics.newText(fonts["sans2"], "RENDERERROR: "..split(error,":")[3])
+        w,h=text:getWidth(),text:getHeight()
+        o.padding=0
+        o.margin=0
+        o.ident=0
+        love.graphics.setColor(1,0,0)
+        love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
         love.graphics.setColor(1,1,1)
-        love.graphics.draw(o.image,o.x,o.y,0,(w+o.padding*3)/img:getWidth(),(h+o.padding*3)/img:getHeight())
-    end
-    love.graphics.setColor(o.bordercolor)
-    love.graphics.setLineWidth(o.borderwidth)
-    love.graphics.rectangle('line',o.x,o.y,w+o.padding*3,h+o.padding*3)
-    love.graphics.setColor(o.color)
-    if content~="" then
         love.graphics.draw(text,o.x+o.padding+o.ident,o.y+o.padding)
-    end
-    if (o.block=="vertical" or o.block=="both") and o.direction == "down" then
-        o.y=o.y+h+o.margin+(o.padding*3)
-    elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
-        o.x=o.x+w+o.margin+(o.padding*3)
-    end
+    end)
     love.graphics.setCanvas()
     love.graphics.origin()
     return o,w+o.margin+(o.padding*3),h+o.margin+(o.padding*3)

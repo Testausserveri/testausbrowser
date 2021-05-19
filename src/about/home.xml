@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testausxml>
+    <päähine>
+        <otsikko>Tervetuloa!</otsikko>
+    </päähine>
+    <sisältö>
+        <linkkinappulat>
+            <nappula kohde="https://testausserveri.github.io/testausbrowser/index.xml">Testausbrowser-portaaliin</nappula>
+        </linkkinappulat>
+        <pienempiotsikko>Käytät Testausbrowser-versiota 1.0</pienempiotsikko>
+        <tekstiä>
+            Tervetuloa Testausbrowserin ihmeelliseen maailmaan!
+        </tekstiä>
+        <pienempiotsikko>Käyttöohjeita:</pienempiotsikko>
+        <tekstiä>
+            Osoitepalkkiin voi kirjoittaa tekstiä ja myös liittää tekstiä näppäinyhdistelmällä ctrl+v. Painamalla enteriä siirryt osoitepalkin osoittamalle sivulle. Sivuilla voi myös liikkua selkeiden nappien avulla, ja halutessasi voit palata edelliselle sivulle käyttämällä vasenta nuolinäppäintä.
+        </tekstiä>
+        <tekstiä>
+            Halutessasi voit opiskella testausXML:ää testausbrowserin kotisivuilta, tehdä oman nettisivun ja ilmoittaa sen lisättäväksi portaaliin. Voit myös kustomoida tätä aloitussivua omanlaiseksesi, muokkaamalla koodia tiedostossa "src/about/home.xml".
+        </tekstiä>
+    </sisältö>
+</testausxml>
