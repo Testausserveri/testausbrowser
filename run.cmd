@@ -1,1 +1,1 @@
-.\bin\love.exe .
+.\bin\love.exe .\src

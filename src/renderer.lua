@@ -1,0 +1,136 @@
+function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+function getDefaults(element)
+    local default = defaults[element.label] or {}
+    local processed = {}
+    for i,v in pairs(default) do
+        if type(v) == "function" then
+            processed[i] = v(element)
+        else
+            processed[i] = v
+        end
+    end
+    return processed
+end
+
+function renderElement(content,element,o,state)
+    table.insert(layers,love.graphics.newCanvas())
+    love.graphics.translate(0,-offset)
+    love.graphics.setCanvas(layers[#layers])
+    local merge = getDefaults(element)
+    o = mergeoptions(o,merge)
+    local img = o.image
+    local w,h=0,0
+    if content~="" then
+        text = love.graphics.newText(fonts[o.font], content)
+        text:setf(content, love.graphics.getWidth(), o.align)
+
+        w = o.width or math.min(love.graphics.getWidth()-o.x,text:getWidth()+o.ident)
+        text:setf(content, w, o.align)
+        h = o.height or text:getHeight()
+    else
+        w = o.width or love.graphics.getWidth()-o.x
+        h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
+    end
+    local mx,my=love.mouse.getPosition()
+    my=my+offset
+    love.graphics.setColor(o.bgcolor)
+    if (mx>o.x and mx<o.x+w+o.padding*3 and my>o.y and my<o.y+h+o.padding*3) then
+        if o.selectcolor then love.graphics.setColor(o.selectcolor) end
+        if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
+    end
+    love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
+    if img then
+        love.graphics.setColor(1,1,1)
+        love.graphics.draw(o.image,o.x,o.y,0,(w+o.padding*3)/img:getWidth(),(h+o.padding*3)/img:getHeight())
+    end
+    love.graphics.setColor(o.bordercolor)
+    love.graphics.setLineWidth(o.borderwidth)
+    love.graphics.rectangle('line',o.x,o.y,w+o.padding*3,h+o.padding*3)
+    love.graphics.setColor(o.color)
+    if content~="" then
+        love.graphics.draw(text,o.x+o.padding+o.ident,o.y+o.padding)
+    end
+    if (o.block=="vertical" or o.block=="both") and o.direction == "down" then
+        o.y=o.y+h+o.margin+(o.padding*3)
+    elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
+        o.x=o.x+w+o.margin+(o.padding*3)
+    end
+    love.graphics.setCanvas()
+    love.graphics.origin()
+    return o,w+o.margin+(o.padding*3),h+o.margin+(o.padding*3)
+end
+
+function mergeoptions(options,merge)
+    local opt={}
+    for i,v in pairs(options) do
+        opt[i]=v
+    end
+    for i,v in pairs(merge) do
+        opt[i]=v
+    end
+    return opt
+end
+
+function rendertestausxml(element,options)
+    local thisoptions = deepcopy(options)
+    if type(element[1])=="table" then
+        local childoptions = mergeoptions(thisoptions,getDefaults(element))
+        local mw,mh = 0,0
+        for index,element in ipairs(element) do
+            local merge, ow, oh = rendertestausxml(element,childoptions)
+            childoptions.x, childoptions.y = merge.x, merge.y
+            mw,mh=math.max(mw,ow or 0),math.max(mh,oh or 0)
+        end
+        local w,h=math.max(childoptions.x-options.x,mw), math.max(childoptions.y-options.y,mh)
+        local o = deepcopy(thisoptions)
+        o.width,o.height=w,h
+        local merge = renderElement("",element,o,"render")
+        thisoptions.y = h + thisoptions.y
+    else
+        merge, width, height = renderElement(string.gsub(element[1] or "", '^%s*(.-)%s*$', '%1'),element,thisoptions,"render")
+        thisoptions = mergeoptions(thisoptions,merge)
+    end
+    return thisoptions, width, height
+end
+
+function render(tree)
+    layers={}
+    contentheight=0
+    for index,branch in ipairs(tree) do
+        if branch.label=="testausxml" then
+            local options = rendertestausxml(branch,rootdefaults)
+            contentheight=options.y
+        end
+    end
+    love.graphics.setColor(1,1,1)
+    for i=#layers,1,-1 do
+        love.graphics.draw(layers[i])
+    end
+end
+
+function love.draw()
+    if tree then
+        render(tree)
+    end
+    love.graphics.setColor(0.8,0.9,0.9)
+    love.graphics.rectangle('fill',0,0,love.graphics.getWidth(),32)
+    love.graphics.setColor(0,0,0)
+    love.graphics.rectangle('line',0,0,love.graphics.getWidth(),32)
+    love.graphics.print(url, 32, 8)
+    love.graphics.setColor(0,0,0,0.5)
+    love.graphics.rectangle('fill', love.graphics.getWidth()-4,32,4,offset/(contentheight-love.graphics.getHeight())*(love.graphics.getHeight()-32))
+end
