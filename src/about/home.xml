@@ -8,7 +8,6 @@
         <linkkinappulat sisennys="16">
             <nappula kohde="https://testausserveri.github.io/testausbrowser/index.xml">Testausbrowser-portaaliin</nappula>
         </linkkinappulat>
-        <pienempiotsikko>Käytät Testausbrowser-versiota 1.1</pienempiotsikko>
         <tekstiä>
             Tervetuloa Testausbrowserin ihmeelliseen maailmaan!
         </tekstiä>
