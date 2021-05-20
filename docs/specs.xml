@@ -11,12 +11,12 @@
             TestausXML-spesifikaatio muuttuu tarpeen mukaan, ja ominaisuuksia lisätään pyydettäessä ja tarvittaessa.
         </tekstiä>
         
-        <pienempiotsikko>Vaihtoehtoisia ominaisuuksia kahvoihin:</pienempiotsikko>
+        <pienempiotsikko>Vaihtoehtoisia ominaisuuksia kaikkiin kahvoihin:</pienempiotsikko>
         <tekstiä>
 x (pikseliä)
 y (pikseliä)
-leveys (pikseliä)
-korkeus (pikseliä)
+leveys (pikseliä, "fit")
+korkeus (pikseliä, "fit")
 
 väri (hex)
 tausta (hex)
@@ -31,7 +31,8 @@ väli (pikseliä)
 
 fontti ("sans1","sans2","sans3")
 suunta ("right","left")
-tila (pikseliä)
+väliennen (pikseliä)
+välijälkeen (pikseliä)
         </tekstiä>
         <otsikko>Kaikki tällä hetkellä tuetut kahvat ja niiden argumentit:</otsikko>
         <pienempiotsikko>päähine</pienempiotsikko>

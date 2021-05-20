@@ -4,10 +4,11 @@
         <otsikko>Tervetuloa!</otsikko>
     </päähine>
     <sisältö>
+        <tekstiä välijälkeen="2" sisennys="2">Kirjanmerkkejä:</tekstiä>
         <linkkinappulat>
             <nappula kohde="https://testausserveri.github.io/testausbrowser/index.xml">Testausbrowser-portaaliin</nappula>
         </linkkinappulat>
-        <pienempiotsikko>Käytät Testausbrowser-versiota 1.0</pienempiotsikko>
+        <pienempiotsikko>Käytät Testausbrowser-versiota 1.1</pienempiotsikko>
         <tekstiä>
             Tervetuloa Testausbrowserin ihmeelliseen maailmaan!
         </tekstiä>

@@ -18,6 +18,7 @@ rootdefaults = {
     padding = 0,
     margin = 0,
     ident = 0,
+    spacing = 0,
 
     direction = "down",
     block = "both",
@@ -26,18 +27,21 @@ rootdefaults = {
 defaults = {
     tekstiä = {
         font = "sans1",
-        margin = 16,
+        margin = 2,
+        spacing = 16,
         block = "both",
     },
     otsikko = {
         font = "sans3",
-        margin = 16,
+        margin = 0,
         block = "both",
+        spacing = 16,
     },
     pienempiotsikko = {
         font = "sans2",
-        margin = 16,
+        margin = 0,
         block = "both",
+        spacing = 16,
     },
     nappula = {
         font = "sans1",
@@ -46,6 +50,7 @@ defaults = {
         block = "both",
         padding = 4,
         selectcolor = {0.3,0.3,1},
+        ident = 0,
     },
     linkkinappulat = {
         direction = "right",

@@ -31,7 +31,8 @@ translations = {
     sisennys = "ident",
     keskitys = "align",
     täyte = "padding",
-    väli = "margin",
+    välijälkeen = "margin",
+    väliennen = "spacing",
 
     fontti = "font",
     suunta = "direction",
@@ -74,7 +75,7 @@ function getDefaults(element)
     return processed
 end
 
-function renderElement(content,element,o,state)
+function renderElement(content,element,o,parent)
     table.insert(layers,love.graphics.newCanvas())
     love.graphics.translate(0,-offset)
     love.graphics.setCanvas(layers[#layers])
@@ -82,18 +83,38 @@ function renderElement(content,element,o,state)
     o = mergeoptions(o,merge)
     local img = o.image
     local w,h=0,0
+    if (o.block=="vertical" or o.block=="both") and o.direction == "down" then
+        o.y=o.y+o.spacing
+    elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
+        o.x=o.x+o.spacing
+    end
     xpcall(function()
         assert(fonts[o.font]~=nil,"Invalid font")
         if content~="" then
             text = love.graphics.newText(fonts[o.font], content)
             text:setf(content, love.graphics.getWidth(), o.align)
 
-            w = o.width or math.min(love.graphics.getWidth()-o.x,text:getWidth()+o.ident)
+            w = o.width or math.min(love.graphics.getWidth()-o.x-o.ident,text:getWidth()+o.ident)
+            if o.direction == "right" and o.width=="fit" then
+                w = (love.graphics.getWidth())/#parent-o.padding*3-o.margin
+            end
             text:setf(content, w, o.align)
             h = o.height or text:getHeight()
+            if o.direction == "down" and o.height=="fit" then
+                h = (love.graphics.getHeight())/#parent-o.padding*3-o.margin
+            end
         else
             w = o.width or love.graphics.getWidth()-o.x
             h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
+            if o.direction == "right" and o.width=="fit" then
+                w = (love.graphics.getWidth())/#parent-o.padding*3-o.margin
+            elseif o.direction == "down" and o.height=="fit" then
+                h = (love.graphics.getHeight())/#parent-o.padding*3-o.margin
+            end
+        end
+        if element.label=="testausxml" then
+            w = love.graphics.getWidth()-o.x
+            h = math.max(h,love.graphics.getHeight())
         end
         local mx,my=love.mouse.getPosition()
         my=my+offset
@@ -157,23 +178,24 @@ function mergeoptions(options,merge)
     return opt
 end
 
-function rendertestausxml(element,options)
+function rendertestausxml(element,options,parent)
     local thisoptions = deepcopy(options)
     if type(element[1])=="table" then
         local childoptions = mergeoptions(thisoptions,getDefaults(element))
         local mw,mh = 0,0
-        for index,element in ipairs(element) do
-            local merge, ow, oh = rendertestausxml(element,childoptions)
+
+        for index,child in ipairs(element) do
+            local merge, ow, oh = rendertestausxml(child,childoptions,element)
             childoptions.x, childoptions.y = merge.x, merge.y
             mw,mh=math.max(mw,ow or 0),math.max(mh,oh or 0)
         end
         local w,h=math.max(childoptions.x-options.x,mw), math.max(childoptions.y-options.y,mh)
         local o = deepcopy(thisoptions)
         o.width,o.height=w,h
-        local merge = renderElement("",element,o,"render")
+        local merge = renderElement("",element,o,parent)
         thisoptions.y = h + thisoptions.y
     else
-        merge, width, height = renderElement(string.gsub(element[1] or "", '^%s*(.-)%s*$', '%1'),element,thisoptions,"render")
+        merge, width, height = renderElement(string.gsub(element[1] or "", '^%s*(.-)%s*$', '%1'),element,thisoptions,parent)
         thisoptions = mergeoptions(thisoptions,merge)
     end
     return thisoptions, width, height
@@ -184,7 +206,7 @@ function render(tree)
     contentheight=0
     for index,branch in ipairs(tree) do
         if branch.label=="testausxml" then
-            local options = rendertestausxml(branch,rootdefaults)
+            local options = rendertestausxml(branch,rootdefaults,tree)
             contentheight=options.y
         end
     end
