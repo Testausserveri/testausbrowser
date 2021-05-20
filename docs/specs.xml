@@ -25,6 +25,8 @@ korostusväri (hex)
 
 reuna (pikseliä)
 sisennys (pikseliä)
+tekstisisennys (pikseliä)
+
 keskitys ("left","center","right")
 täyte (pikseliä)
 väli (pikseliä)

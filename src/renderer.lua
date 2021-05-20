@@ -29,6 +29,7 @@ translations = {
 
     reuna = "borderwidth",
     sisennys = "ident",
+    tekstisisennys = "contentident",
     keskitys = "align",
     täyte = "padding",
     välijälkeen = "margin",
@@ -94,22 +95,22 @@ function renderElement(content,element,o,parent)
             text = love.graphics.newText(fonts[o.font], content)
             text:setf(content, love.graphics.getWidth(), o.align)
 
-            w = o.width or math.min(love.graphics.getWidth()-o.x-o.ident,text:getWidth()+o.ident)
+            w = o.width or math.min(love.graphics.getWidth()-o.x-o.ident-o.contentident,text:getWidth()+o.contentident)
             if o.direction == "right" and o.width=="fit" then
-                w = (love.graphics.getWidth())/#parent-o.padding*3-o.margin
+                w = (love.graphics.getWidth())/#parent-o.padding*2-o.margin
             end
             text:setf(content, w, o.align)
             h = o.height or text:getHeight()
             if o.direction == "down" and o.height=="fit" then
-                h = (love.graphics.getHeight())/#parent-o.padding*3-o.margin
+                h = (love.graphics.getHeight())/#parent-o.padding*2-o.margin
             end
         else
             w = o.width or love.graphics.getWidth()-o.x
             h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
             if o.direction == "right" and o.width=="fit" then
-                w = (love.graphics.getWidth())/#parent-o.padding*3-o.margin
+                w = (love.graphics.getWidth())/#parent-o.padding*2-o.margin
             elseif o.direction == "down" and o.height=="fit" then
-                h = (love.graphics.getHeight())/#parent-o.padding*3-o.margin
+                h = (love.graphics.getHeight())/#parent-o.padding*2-o.margin
             end
         end
         if element.label=="testausxml" then
@@ -130,26 +131,26 @@ function renderElement(content,element,o,parent)
         assert(type(o.borderwidth)=="number","Invalid border property")
 
         love.graphics.setColor(o.bgcolor)
-        if (mx>o.x and mx<o.x+w+o.padding*3 and my>o.y and my<o.y+h+o.padding*3) then
+        if (mx>o.x and mx<o.x+w+o.padding*2 and my>o.y and my<o.y+h+o.padding*2) then
             if o.selectcolor then love.graphics.setColor(o.selectcolor) end
             if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
         end
-        love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
+        love.graphics.rectangle('fill',o.x+o.ident,o.y,w+o.padding*2,h+o.padding*2)
         if img then
             love.graphics.setColor(1,1,1)
-            love.graphics.draw(o.image,o.x,o.y,0,(w+o.padding*3)/img:getWidth(),(h+o.padding*3)/img:getHeight())
+            love.graphics.draw(o.image,o.x+o.ident+o.padding,o.y+o.padding,0,w/img:getWidth(),h/img:getHeight())
         end
         love.graphics.setColor(o.bordercolor)
         love.graphics.setLineWidth(o.borderwidth)
-        love.graphics.rectangle('line',o.x,o.y,w+o.padding*3,h+o.padding*3)
+        love.graphics.rectangle('line',o.x+o.ident,o.y,w+o.padding*2,h+o.padding*2)
         love.graphics.setColor(o.color)
         if content~="" then
-            love.graphics.draw(text,o.x+o.padding+o.ident,o.y+o.padding)
+            love.graphics.draw(text,o.x+(o.padding/2)+o.ident+o.contentident,o.y+(o.padding/2))
         end
         if (o.block=="vertical" or o.block=="both") and o.direction == "down" then
-            o.y=o.y+h+o.margin+(o.padding*3)
+            o.y=o.y+h+o.margin+(o.padding*2)
         elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
-            o.x=o.x+w+o.margin+(o.padding*3)
+            o.x=o.x+w+o.margin+(o.padding*2)
         end
     end, function(error)
         text = love.graphics.newText(fonts["sans2"], "RENDERERROR: "..split(error,":")[3])
@@ -164,7 +165,7 @@ function renderElement(content,element,o,parent)
     end)
     love.graphics.setCanvas()
     love.graphics.origin()
-    return o,w+o.margin+(o.padding*3),h+o.margin+(o.padding*3)
+    return o,w+o.margin+(o.padding*2),h+o.margin+(o.padding*2)
 end
 
 function mergeoptions(options,merge)

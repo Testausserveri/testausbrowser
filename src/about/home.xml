@@ -5,7 +5,7 @@
     </päähine>
     <sisältö>
         <tekstiä välijälkeen="2" sisennys="2">Kirjanmerkkejä:</tekstiä>
-        <linkkinappulat>
+        <linkkinappulat sisennys="16">
             <nappula kohde="https://testausserveri.github.io/testausbrowser/index.xml">Testausbrowser-portaaliin</nappula>
         </linkkinappulat>
         <pienempiotsikko>Käytät Testausbrowser-versiota 1.1</pienempiotsikko>

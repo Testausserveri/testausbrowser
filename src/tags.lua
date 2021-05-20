@@ -18,6 +18,7 @@ rootdefaults = {
     padding = 0,
     margin = 0,
     ident = 0,
+    contentident = 0,
     spacing = 0,
 
     direction = "down",
@@ -36,12 +37,14 @@ defaults = {
         margin = 0,
         block = "both",
         spacing = 16,
+        margin = 16,
     },
     pienempiotsikko = {
         font = "sans2",
         margin = 0,
         block = "both",
         spacing = 16,
+        margin = 16,
     },
     nappula = {
         font = "sans1",
@@ -50,7 +53,7 @@ defaults = {
         block = "both",
         padding = 4,
         selectcolor = {0.3,0.3,1},
-        ident = 0,
+        contentident = 0,
     },
     linkkinappulat = {
         direction = "right",
@@ -60,7 +63,7 @@ defaults = {
         bgcolor = {0.9,0.9,0.9},
         width = function(element) return love.graphics.getWidth() end,
         x = 0,
-        ident = 16,
+        contentident = 16,
     },
     kuva = {
         image = function(element)
@@ -68,7 +71,6 @@ defaults = {
                 local response = request.send(element.xarg["lähde"])
                 local data = love.data.newByteData(response.body)
                 cache[element.xarg["lähde"]] = love.graphics.newImage(data)
-                print("yee")
             end
             return cache[element.xarg["lähde"]]
         end,
@@ -80,7 +82,7 @@ defaults = {
         block = "vertical"
     },
     sisältö = {
-        ident = 16
+        contentident = 16
     }
 }
 
