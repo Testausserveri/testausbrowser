@@ -22,8 +22,6 @@ translations = {
     leveys = "width",
     korkeus = "height",
 
-    väri = "color",
-    tausta = "bgcolor",
     reunaväri = "bordercolor",
     korostusväri = "selectcolor",
 
@@ -35,7 +33,6 @@ translations = {
     välijälkeen = "margin",
     väliennen = "spacing",
 
-    fontti = "font",
     suunta = "direction",
     tila = "block",
 }
@@ -96,21 +93,16 @@ function renderElement(content,element,o,parent)
             text:setf(content, love.graphics.getWidth(), o.align)
 
             w = o.width or math.min(love.graphics.getWidth()-o.x-o.ident-o.contentident,text:getWidth()+o.contentident)
-            if o.direction == "right" and o.width=="fit" then
-                w = (love.graphics.getWidth())/#parent-o.padding*2-o.margin
+            if w=="fit" then
+                w = ((love.graphics.getWidth()-o.ident)/#parent-o.padding*2-o.margin-o.ident)
             end
             text:setf(content, w, o.align)
             h = o.height or text:getHeight()
-            if o.direction == "down" and o.height=="fit" then
-                h = (love.graphics.getHeight())/#parent-o.padding*2-o.margin
-            end
         else
             w = o.width or love.graphics.getWidth()-o.x
             h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
-            if o.direction == "right" and o.width=="fit" then
-                w = (love.graphics.getWidth())/#parent-o.padding*2-o.margin
-            elseif o.direction == "down" and o.height=="fit" then
-                h = (love.graphics.getHeight())/#parent-o.padding*2-o.margin
+            if w=="fit" then
+                w = ((love.graphics.getWidth()-o.ident)/#parent-o.padding*2-o.margin-o.ident)
             end
         end
         if element.label=="testausxml" then
@@ -153,6 +145,7 @@ function renderElement(content,element,o,parent)
             o.x=o.x+w+o.margin+(o.padding*2)
         end
     end, function(error)
+        print(error)
         text = love.graphics.newText(fonts["sans2"], "RENDERERROR: "..split(error,":")[3])
         w,h=text:getWidth(),text:getHeight()
         o.padding=0

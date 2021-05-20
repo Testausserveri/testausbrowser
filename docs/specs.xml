@@ -18,8 +18,6 @@ y (pikseliä)
 leveys (pikseliä, "fit")
 korkeus (pikseliä, "fit")
 
-väri (hex)
-tausta (hex)
 reunaväri (hex)
 korostusväri (hex)
 
@@ -31,7 +29,6 @@ keskitys ("left","center","right")
 täyte (pikseliä)
 väli (pikseliä)
 
-fontti ("sans1","sans2","sans3")
 suunta ("right","left")
 väliennen (pikseliä)
 välijälkeen (pikseliä)
@@ -81,6 +78,10 @@ välijälkeen (pikseliä)
         </tekstiä>
         <tekstiä>
            korkeus: välin korkeus
+        </tekstiä>
+        <pienempiotsikko>rivi</pienempiotsikko>
+        <tekstiä>
+            Tekee koko vapaan tilan levyisen taulukon rivin, ja asettelee rivin sisällä olevat elementit vaaakasuuntaisesti
         </tekstiä>
     </sisältö>
 </testausxml>

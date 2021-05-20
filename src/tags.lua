@@ -31,6 +31,7 @@ defaults = {
         margin = 2,
         spacing = 16,
         block = "both",
+        bordercolor = {0,0,0,0},
     },
     otsikko = {
         font = "sans3",
@@ -38,6 +39,8 @@ defaults = {
         block = "both",
         spacing = 16,
         margin = 16,
+        color = {0,0,0.3},
+        bordercolor = {0,0,0,0},
     },
     pienempiotsikko = {
         font = "sans2",
@@ -45,6 +48,8 @@ defaults = {
         block = "both",
         spacing = 16,
         margin = 16,
+        color = {0.2,0.2,0.4},
+        bordercolor = {0,0,0,0},
     },
     nappula = {
         font = "sans1",
@@ -58,12 +63,20 @@ defaults = {
     linkkinappulat = {
         direction = "right",
         block = "vertical",
+        ident = 16,
+        bordercolor = {0,0,0,0},
+    },
+    rivi = {
+        direction = "right",
+        block = "vertical",
+        bordercolor = {0.5,0.5,0.5},
     },
     päähine = {
-        bgcolor = {0.9,0.9,0.9},
+        bgcolor = {0.9,0.9,1},
         width = function(element) return love.graphics.getWidth() end,
         x = 0,
         contentident = 16,
+        bordercolor = {0,0,0,0},
     },
     kuva = {
         image = function(element)
@@ -76,13 +89,16 @@ defaults = {
         end,
         width = function(element) return element.xarg["leveys"] end,
         height = function(element) return element.xarg["korkeus"] end,
+        bordercolor = {0,0,0,0},
     },
     väli = {
         height = function(element) return element.xarg["korkeus"] or 16 end,
-        block = "vertical"
+        block = "vertical",
+        bordercolor = {0,0,0,0},
     },
     sisältö = {
-        contentident = 16
+        contentident = 16,
+        bordercolor = {0,0,0,0},
     }
 }
 

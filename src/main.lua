@@ -16,6 +16,7 @@ function split(inputstr, sep)
 end
 
 function fetchURL(furl,external)
+    offset = 0
     if furl=="" then furl=url end
     if external then
         love.system.openURL(furl)
