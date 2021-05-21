@@ -16,8 +16,10 @@ function split(inputstr, sep)
 end
 
 function fetchURL(furl,external)
+    tree = nil
     offset = 0
     if furl=="" then furl=url end
+    if string.find(furl,"t://")==1 then furl="http://syvis.net:7302/koyhanmiehendns/?url="..furl end
     if external then
         love.system.openURL(furl)
     else
