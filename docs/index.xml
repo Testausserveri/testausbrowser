@@ -6,15 +6,15 @@
     <sisältö>
         <linkkinappulat suunta="down" leveys="fit" tekstisisennys="0">
             <rivi>
-                <nappula kohde="https://testausxml.pages.dev/index.xml">Testausserverin kotisivut</nappula>
+                <nappula kohde="t://testausserveri.t">Testausserverin kotisivut</nappula>
                 <tekstiä>Testausserveri.fi, mutta testausXML muodossa; Miksu</tekstiä>
             </rivi>
             <rivi>
-                <nappula kohde="https://testausserveri.github.io/testausbrowser/specs.xml">TestausXML-spesifikaatio</nappula>
+                <nappula kohde="/specs.xml">TestausXML-spesifikaatio</nappula>
                 <tekstiä>TestausXML:n tuetut ominaisuudet; Hakaponttoauto</tekstiä>
             </rivi>
             <rivi>
-                <nappula kohde="http://syvis.net/saab.xml">Saab-sivu</nappula>
+                <nappula kohde="t://saab.txml">Saab-sivu</nappula>
                 <tekstiä>Saabia ylistävä sivu; hillosokeri2</tekstiä>
             </rivi>
         </linkkinappulat>

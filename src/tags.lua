@@ -108,8 +108,7 @@ actions = {
             if element.xarg["avaaulkoisesti"] then
                 fetchURL(element.xarg["kohde"],true)
             else
-                url=element.xarg["kohde"]
-                fetchURL(url)
+                fetchURL(element.xarg["kohde"])
             end
         end
     end

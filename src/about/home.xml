@@ -6,7 +6,7 @@
     <sisältö>
         <tekstiä välijälkeen="2" sisennys="2">Kirjanmerkkejä:</tekstiä>
         <linkkinappulat sisennys="16">
-            <nappula kohde="https://testausserveri.github.io/testausbrowser/index.xml">Testausbrowser-portaaliin</nappula>
+            <nappula kohde="t://home.t">Testausbrowser-portaaliin</nappula>
         </linkkinappulat>
         <tekstiä>
             Tervetuloa Testausbrowserin ihmeelliseen maailmaan!

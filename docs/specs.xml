@@ -5,7 +5,7 @@
     </päähine>
     <sisältö>
         <linkkinappulat>
-            <nappula kohde="https://testausserveri.github.io/testausbrowser/">Takaisin kotisivulle</nappula>
+            <nappula kohde="t://home.t">Takaisin kotisivulle</nappula>
         </linkkinappulat>
         <tekstiä>
             TestausXML-spesifikaatio muuttuu tarpeen mukaan, ja ominaisuuksia lisätään pyydettäessä ja tarvittaessa.

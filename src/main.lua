@@ -19,6 +19,12 @@ function fetchURL(furl,external)
     tree = nil
     offset = 0
     if furl=="" then furl=url end
+    if string.find(furl,"/")==1 then 
+        local s = string.find(url,"://")
+        local t = split(string.sub(url,s+1),"/")
+        t[#t]=string.sub(furl,2)
+        furl=string.sub(url,1,s+2)..table.concat(t,"/")
+    end
     if string.find(furl,"t://")==1 then furl="http://syvis.net:7302/koyhanmiehendns/?url="..furl end
     if external then
         love.system.openURL(furl)
@@ -34,6 +40,7 @@ function fetchURL(furl,external)
                 end
             end
         elseif (string.find(furl,"about/")==1) then
+            if (furl~="about/notfound" and furl~="about/displayerror") then url=furl end
             page=love.filesystem.read(furl..".xml")
             success, tree = pcall(xml.collect,page)
             if not success then
@@ -41,6 +48,7 @@ function fetchURL(furl,external)
                 tree=nil
             end
         else
+            url=furl
             response = request.send(furl)
             if not (response==false) then
                 success, tree = pcall(xml.collect,response.body)
