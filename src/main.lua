@@ -19,11 +19,19 @@ function fetchURL(furl,external)
     tree = nil
     offset = 0
     if furl=="" then furl=url end
-    if string.find(furl,"/")==1 then 
+    if string.find(furl,"/")==1 then
+        if string.find(url,"%.xml")==nil then url=url.."/index.xml" end
         local s = string.find(url,"://")
         local t = split(string.sub(url,s+1),"/")
         t[#t]=string.sub(furl,2)
         furl=string.sub(url,1,s+2)..table.concat(t,"/")
+    end
+    if (furl~="about/notfound" and furl~="about/displayerror") then
+        url=furl
+        table.insert(history,furl)
+        love.graphics.setBackgroundColor(1,1,1)
+    else
+        love.graphics.setBackgroundColor(1,0,0)
     end
     if string.find(furl,"t://")==1 then furl="http://syvis.net:7302/koyhanmiehendns/?url="..furl end
     if external then
@@ -40,7 +48,6 @@ function fetchURL(furl,external)
                 end
             end
         elseif (string.find(furl,"about/")==1) then
-            if (furl~="about/notfound" and furl~="about/displayerror") then url=furl end
             page=love.filesystem.read(furl..".xml")
             success, tree = pcall(xml.collect,page)
             if not success then
@@ -48,21 +55,19 @@ function fetchURL(furl,external)
                 tree=nil
             end
         else
-            url=furl
             response = request.send(furl)
+            print(furl)
             if not (response==false) then
                 success, tree = pcall(xml.collect,response.body)
-                love.graphics.setBackgroundColor(1,1,1)
             else
                 fetchURL("about/notfound")
-                love.graphics.setBackgroundColor(1,0,0)
+                table.remove(history)
             end
             if not success then
-                love.graphics.setBackgroundColor(1,0,0)
                 tree=nil
                 fetchURL("about/displayerror")
+                table.remove(history)
             end
-            table.insert(history,furl)
             love.timer.sleep(0.2)
         end
     end
