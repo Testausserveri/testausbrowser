@@ -16,7 +16,6 @@ function split(inputstr, sep)
 end
 
 function fetchURL(furl,external)
-    tree = nil
     offset = 0
     if furl=="" then furl=url end
     if string.find(furl,"/")==1 then
@@ -26,11 +25,11 @@ function fetchURL(furl,external)
         t[#t]=string.sub(furl,2)
         furl=string.sub(url,1,s+2)..table.concat(t,"/")
     end
-    if (furl~="about/notfound" and furl~="about/displayerror") then
+    if (furl~="about/notfound" and furl~="about/displayerror" and not external) then
         url=furl
         table.insert(history,furl)
         love.graphics.setBackgroundColor(1,1,1)
-    else
+    elseif furl=="about/notfound" or furl=="about/displayerror" then
         love.graphics.setBackgroundColor(1,0,0)
     end
     if string.find(furl,"t://")==1 then furl="http://syvis.net:7302/koyhanmiehendns/?url="..furl end
@@ -57,7 +56,7 @@ function fetchURL(furl,external)
         else
             response = request.send(furl)
             print(furl)
-            if not (response==false) then
+            if not (response==false or response.code==404) then
                 success, tree = pcall(xml.collect,response.body)
             else
                 fetchURL("about/notfound")

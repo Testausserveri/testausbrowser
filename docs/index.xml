@@ -17,6 +17,10 @@
                 <nappula kohde="t://saab.txml">Saab-sivu</nappula>
                 <tekstiä>Saabia ylistävä sivu; hillosokeri2</tekstiä>
             </rivi>
+            <rivi>
+                <nappula kohde="t://testaushost.t">Testaushost</nappula>
+                <tekstiä>Ilmainen host ja nimipalvelin testausnetille</tekstiä>
+            </rivi>
         </linkkinappulat>
         <pienempiotsikko>Kiitos, että käytät Testausbrowseria!</pienempiotsikko>
         <tekstiä>
