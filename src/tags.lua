@@ -104,12 +104,13 @@ defaults = {
 
 actions = {
     nappula = function(element)
-        if element.xarg["kohde"] then
+        if element.xarg["kohde"] and love.window.hasMouseFocus() then
             if element.xarg["avaaulkoisesti"] then
                 fetchURL(element.xarg["kohde"],true)
             else
                 fetchURL(element.xarg["kohde"])
             end
+            love.timer.sleep(0.2)
         end
     end
 }

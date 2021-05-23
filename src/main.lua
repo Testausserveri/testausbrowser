@@ -55,7 +55,6 @@ function fetchURL(furl,external)
             end
         else
             response = request.send(furl)
-            print(furl)
             if not (response==false or response.code==404) then
                 success, tree = pcall(xml.collect,response.body)
             else
@@ -67,7 +66,6 @@ function fetchURL(furl,external)
                 fetchURL("about/displayerror")
                 table.remove(history)
             end
-            love.timer.sleep(0.2)
         end
     end
 end
