@@ -74,7 +74,7 @@ function getDefaults(element)
 end
 
 function renderElement(content,element,o,parent)
-    table.insert(layers,love.graphics.newCanvas())
+    if getDefaults(parent).layer or o.layer or #layers==0 then table.insert(layers,love.graphics.newCanvas()) end
     love.graphics.translate(0,-offset)
     love.graphics.setCanvas(layers[#layers])
     local merge = getDefaults(element)
@@ -144,6 +144,7 @@ function renderElement(content,element,o,parent)
         elseif (o.block=="horizontal" or o.block=="both") and o.direction == "right" then
             o.x=o.x+w+o.margin+(o.padding*2)
         end
+        o.layer = false
     end, function(error)
         print(error)
         text = love.graphics.newText(fonts["sans2"], "RENDERERROR: "..split(error,":")[3])
@@ -184,7 +185,7 @@ function rendertestausxml(element,options,parent)
             mw,mh=math.max(mw,ow or 0),math.max(mh,oh or 0)
         end
         local w,h=math.max(childoptions.x-options.x,mw), math.max(childoptions.y-options.y,mh)
-        local o = deepcopy(thisoptions)
+        local o = mergeoptions(deepcopy(thisoptions),getDefaults(element))
         o.width,o.height=w,h
         local merge = renderElement("",element,o,parent)
         thisoptions.y = h + thisoptions.y
@@ -212,7 +213,15 @@ end
 
 function love.draw()
     if tree then
-        render(tree)
+        success,error = pcall(render,tree)
+        if not success then
+            console.log("XML render errored with: "..error)
+            fetchURL("about/displayerror")
+            return
+        end
+    else
+        contentheight=0
+        layers={}
     end
     love.graphics.setColor(0.8,0.9,0.9)
     love.graphics.rectangle('fill',0,0,love.graphics.getWidth(),32)
@@ -221,4 +230,19 @@ function love.draw()
     love.graphics.print(url, 32, 8)
     love.graphics.setColor(0,0,0,0.5)
     love.graphics.rectangle('fill', love.graphics.getWidth()-4,32,4,offset/(contentheight-love.graphics.getHeight())*(love.graphics.getHeight()-32))
+    r,g,b = love.graphics.getBackgroundColor()
+    if love.keyboard.isDown("f3") or g==0 then
+        love.graphics.setFont(fonts.sans1)
+        text = love.graphics.newText(fonts.sans1, console.content)
+        text:setf(console.content, love.graphics.getWidth(), "left")
+
+        love.graphics.setColor(0,0,0,0.75)
+        love.graphics.rectangle('fill', 0,love.graphics.getHeight()-text:getHeight(),love.graphics.getWidth(),text:getHeight())
+
+        love.graphics.setColor(0,0,0)
+        love.graphics.print("CONSOLE:",32,love.graphics.getHeight()-text:getHeight()-16)
+
+        love.graphics.setColor(1,1,1)
+        love.graphics.draw(text,0,love.graphics.getHeight()-text:getHeight())
+    end
 end

@@ -23,6 +23,7 @@ rootdefaults = {
 
     direction = "down",
     block = "both",
+    layer = false,
 }
 
 defaults = {
@@ -65,11 +66,13 @@ defaults = {
         block = "vertical",
         ident = 16,
         bordercolor = {0,0,0,0},
+        layer = true,
     },
     rivi = {
         direction = "right",
         block = "vertical",
         bordercolor = {0.5,0.5,0.5},
+        layer = true,
     },
     päähine = {
         bgcolor = {0.9,0.9,1},
@@ -77,6 +80,7 @@ defaults = {
         x = 0,
         contentident = 16,
         bordercolor = {0,0,0,0},
+        layer = true,
     },
     kuva = {
         image = function(element)
@@ -90,6 +94,7 @@ defaults = {
         width = function(element) return element.xarg["leveys"] end,
         height = function(element) return element.xarg["korkeus"] end,
         bordercolor = {0,0,0,0},
+        layer = true,
     },
     väli = {
         height = function(element) return element.xarg["korkeus"] or 16 end,

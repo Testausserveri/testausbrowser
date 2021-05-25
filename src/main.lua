@@ -4,6 +4,16 @@ require("renderer")
 require("tags")
 require("ui")
 
+console = {content=string.rep("\n ",10)}
+console.log = function(text)
+    local rows=split(console.content,"\n")
+    table.insert(rows,text)
+    if #rows>10 then
+        table.remove(rows,1)
+    end
+    console.content=table.concat(rows,"\n")
+end
+
 function split(inputstr, sep)
     if sep == nil then
             sep = "%s"
@@ -32,12 +42,13 @@ function fetchURL(furl,external)
     elseif furl=="about/notfound" or furl=="about/displayerror" then
         love.graphics.setBackgroundColor(1,0,0)
     end
-    if string.find(furl,"t://")==1 then furl="http://syvis.net:7302/koyhanmiehendns/?url="..furl end
+    if string.find(furl,"t://")==1 then console.log("Getting redirection from köyhänmiehenDNS for "..furl) furl="207.180.196.31:7302/koyhanmiehendns/?url="..furl end
     if external then
         love.system.openURL(furl)
     else
         local success=true
         if (string.find(furl,"command/")==1) then
+            console.log("Running command: "..furl)
             if furl=="command/back" then
                 if #history>1 then
                     table.remove(history)
@@ -49,14 +60,21 @@ function fetchURL(furl,external)
         elseif (string.find(furl,"about/")==1) then
             page=love.filesystem.read(furl..".xml")
             success, tree = pcall(xml.collect,page)
+            console.log(success and "local file " .. furl.." loaded succesfully." or furl.." errored in xml parse with: "..tree)
             if not success then
                 love.graphics.setBackgroundColor(1,0,0)
                 tree=nil
             end
         else
+            local start = love.timer.getTime()*1000
             response = request.send(furl)
+            local stop = love.timer.getTime()*1000
+            console.log(response and "HTTP request to "..furl.." returned code "..response.code.." in "..(stop-start).." ms" or "request to "..furl.." unsuccesful.")
             if not (response==false or response.code==404) then
+                local start = love.timer.getTime()*1000
                 success, tree = pcall(xml.collect,response.body)
+                local stop = love.timer.getTime()*1000
+                console.log(success and "XML parse succesful in "..(stop-start).." ms" or "XML parse errored with: "..tree)
             else
                 fetchURL("about/notfound")
                 table.remove(history)
