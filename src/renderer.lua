@@ -74,9 +74,7 @@ function getDefaults(element)
 end
 
 function renderElement(content,element,o,parent)
-    if getDefaults(parent).layer or o.layer or #layers==0 then table.insert(layers,love.graphics.newCanvas()) end
-    love.graphics.translate(0,-offset)
-    love.graphics.setCanvas(layers[#layers])
+
     local merge = getDefaults(element)
     o = mergeoptions(o,merge)
     local img = o.image
@@ -122,6 +120,31 @@ function renderElement(content,element,o,parent)
         assert(type(o.margin)=="number","Invalid margin property")
         assert(type(o.borderwidth)=="number","Invalid border property")
 
+
+        local cw,ch =   w+o.margin+(o.padding*2)+(o.borderwidth*2)+o.ident+o.contentident,
+                        h+o.margin+(o.padding*2)+(o.borderwidth*2)
+        if o.layer then
+            cw = love.graphics.getWidth()
+            if contentheight and contentheight-o.x>0 then
+                ch=contentheight-o.x
+            else
+                ch=love.graphics.getHeight()
+            end
+        end
+        local layer = {
+            canvas = love.graphics.newCanvas(cw,ch),
+            x = o.x-o.borderwidth,
+            y = o.y-o.borderwidth
+        }
+        
+        if getDefaults(parent).layer or o.layer or #layers==0 then
+            table.insert(layers,layer)
+        else
+            layer = layers[#layers]
+        end
+        love.graphics.setCanvas(layer.canvas)
+        love.graphics.translate(-layer.x,-layer.y)
+
         love.graphics.setColor(o.bgcolor)
         if (mx>o.x and mx<o.x+w+o.padding*2 and my>o.y and my<o.y+h+o.padding*2) then
             if o.selectcolor then love.graphics.setColor(o.selectcolor) end
@@ -148,6 +171,7 @@ function renderElement(content,element,o,parent)
     end, function(error)
         print(error)
         text = love.graphics.newText(fonts["sans2"], "RENDERERROR: "..split(error,":")[3])
+        console.log(error)
         w,h=text:getWidth(),text:getHeight()
         o.padding=0
         o.margin=0
@@ -197,17 +221,18 @@ function rendertestausxml(element,options,parent)
 end
 
 function render(tree)
+    if not contentheight then contentheight=0 end
     layers={}
-    contentheight=0
     for index,branch in ipairs(tree) do
         if branch.label=="testausxml" then
             local options = rendertestausxml(branch,rootdefaults,tree)
             contentheight=options.y
         end
     end
+    love.graphics.origin()
     love.graphics.setColor(1,1,1)
     for i=#layers,1,-1 do
-        love.graphics.draw(layers[i])
+        love.graphics.draw(layers[i].canvas,layers[i].x,layers[i].y-offset)
     end
 end
 

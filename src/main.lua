@@ -5,7 +5,8 @@ require("tags")
 require("ui")
 
 console = {content=string.rep("\n ",10)}
-console.log = function(text)
+console.log = function(...)
+    local text = table.concat({...},"    ")
     local rows=split(console.content,"\n")
     table.insert(rows,text)
     if #rows>10 then
