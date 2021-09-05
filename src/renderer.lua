@@ -120,7 +120,6 @@ function renderElement(content,element,o,parent)
         assert(type(o.margin)=="number","Invalid margin property")
         assert(type(o.borderwidth)=="number","Invalid border property")
 
-
         local cw,ch =   w+o.margin+(o.padding*2)+(o.borderwidth*2)+o.ident+o.contentident,
                         h+o.margin+(o.padding*2)+(o.borderwidth*2)
         if o.layer then
@@ -148,7 +147,7 @@ function renderElement(content,element,o,parent)
         love.graphics.setColor(o.bgcolor)
         if (mx>o.x and mx<o.x+w+o.padding*2 and my>o.y and my<o.y+h+o.padding*2) then
             if o.selectcolor then love.graphics.setColor(o.selectcolor) end
-            if love.mouse.isDown(1) and actions[element.label] then actions[element.label](element) end
+            if love.mouse.isDown(1) and actions[element.label] then actions[element.label].click(element) end
         end
         love.graphics.rectangle('fill',o.x+o.ident,o.y,w+o.padding*2,h+o.padding*2)
         if img then
@@ -265,7 +264,11 @@ function love.draw()
         love.graphics.rectangle('fill', 0,love.graphics.getHeight()-text:getHeight(),love.graphics.getWidth(),text:getHeight())
 
         love.graphics.setColor(0,0,0)
-        love.graphics.print("CONSOLE:",32,love.graphics.getHeight()-text:getHeight()-16)
+        local size = 0
+        for i,layer in ipairs(layers) do
+            size=size+layer.canvas:newImageData():getSize()
+        end
+        love.graphics.print("LAYERS: "..#layers.." ("..(size/1000).."kB)",32,love.graphics.getHeight()-text:getHeight()-16)
 
         love.graphics.setColor(1,1,1)
         love.graphics.draw(text,0,love.graphics.getHeight()-text:getHeight())

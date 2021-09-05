@@ -28,12 +28,8 @@ function xml.collect(s)
         else  -- end tag
             local toclose = table.remove(stack)  -- remove top
             top = stack[#stack]
-            if #stack < 1 then
-            error("nothing to close with "..label)
-            end
-            if toclose.label ~= label then
-            error("trying to close "..toclose.label.." with "..label)
-            end
+            assert(not( #stack < 1), "nothing to close with "..label)
+            assert(not( toclose.label ~= label),"trying to close "..toclose.label.." with "..label)
             table.insert(top, toclose)
         end
         i = j+1
@@ -42,9 +38,7 @@ function xml.collect(s)
     if not string.find(text, "^%s*$") then
         table.insert(stack[#stack], text)
     end
-    if #stack > 1 then
-        error("unclosed "..stack[#stack].label)
-    end
+    assert(not (#stack > 1), "unclosed "..(stack[#stack].label or "shit"))
     return stack[1]
 end
 
