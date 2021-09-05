@@ -1,9 +1,12 @@
+--The definitions of fonts
+
 fonts = {
     sans1 = love.graphics.newFont(12),
     sans2 = love.graphics.newFont(18),
     sans3 = love.graphics.newFont(24),
 }
 
+--The default options for the document root passed to rendertestausxml
 rootdefaults = {
     x=0,
     y=32,
@@ -26,6 +29,7 @@ rootdefaults = {
     layer = false,
 }
 
+--Default options for elements
 defaults = {
     tekstiä = {
         font = "sans1",
@@ -107,6 +111,7 @@ defaults = {
     }
 }
 
+--interaction functions for elements:
 actions = {
     nappula = {
         click = function(element,o)

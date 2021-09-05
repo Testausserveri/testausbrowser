@@ -1,3 +1,5 @@
+--XML parser (not mine, I found it from the side of the road)
+
 local xml={}
 function xml.parseargs(s)
     local arg = {}

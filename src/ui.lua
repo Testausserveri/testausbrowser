@@ -1,3 +1,4 @@
+--the basic keybinds and input handling
 function love.keypressed(key, scancode)
     if key=="return" then
         fetchURL(url)
