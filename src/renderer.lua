@@ -27,8 +27,8 @@ translations = {
     korostusväri = "selectcolor",
 
     reuna = "borderwidth",
-    sisennys = "ident",
-    tekstisisennys = "contentident",
+    sisennys = "indent",
+    tekstisisennys = "contentindent",
     keskitys = "align",
     täyte = "padding",
     välijälkeen = "margin",
@@ -107,9 +107,9 @@ function renderElement(content,element,o,parent)
             text = love.graphics.newText(fonts[o.font], content)
             text:setf(content, love.graphics.getWidth(), o.align)
 
-            w = o.width or math.min(love.graphics.getWidth()-o.x-o.ident-o.contentident,text:getWidth()+o.contentident)
+            w = o.width or math.min(love.graphics.getWidth()-o.x-o.indent-o.contentindent,text:getWidth()+o.contentindent)
             if w=="fit" then
-                w = ((love.graphics.getWidth()-o.ident)/#parent-o.padding*2-o.margin-o.ident)
+                w = ((love.graphics.getWidth()-o.indent)/#parent-o.padding*2-o.margin-o.indent)
             end
             text:setf(content, w, o.align)
             h = o.height or text:getHeight()
@@ -117,7 +117,7 @@ function renderElement(content,element,o,parent)
             w = o.width or love.graphics.getWidth()-o.x
             h = o.height or (img and (img:getHeight()/img:getWidth())*w or 32)
             if w=="fit" then
-                w = ((love.graphics.getWidth()-o.ident)/#parent-o.padding*2-o.margin-o.ident)
+                w = ((love.graphics.getWidth()-o.indent)/#parent-o.padding*2-o.margin-o.indent)
             end
         end
         --Special cases for document root
@@ -135,13 +135,13 @@ function renderElement(content,element,o,parent)
         assert(type(o.bgcolor)=="table","Invalid background color")
         assert(type(o.color)=="table","Invalid text color")
         assert(type(o.bordercolor)=="table","Invalid border color")
-        assert(type(o.ident)=="number","Invalid identation property")
+        assert(type(o.indent)=="number","Invalid indentation property")
         assert(type(o.padding)=="number","Invalid padding property")
         assert(type(o.margin)=="number","Invalid margin property")
         assert(type(o.borderwidth)=="number","Invalid border property")
 
         --The element's total width & height for the canvas.
-        local cw,ch =   w+o.margin+(o.padding*2)+(o.borderwidth*2)+o.ident+o.contentident,
+        local cw,ch =   w+o.margin+(o.padding*2)+(o.borderwidth*2)+o.indent+o.contentindent,
                         h+o.margin+(o.padding*2)+(o.borderwidth*2)
         if o.layer then
             cw = love.graphics.getWidth()
@@ -172,23 +172,23 @@ function renderElement(content,element,o,parent)
             if o.selectcolor then love.graphics.setColor(o.selectcolor) end
             if love.mouse.isDown(1) and actions[element.label] then actions[element.label].click(element) end
         end
-        love.graphics.rectangle('fill',o.x+o.ident,o.y,w+o.padding*2,h+o.padding*2)
+        love.graphics.rectangle('fill',o.x+o.indent,o.y,w+o.padding*2,h+o.padding*2)
         
         --draws image if specified
         if img then
             love.graphics.setColor(1,1,1)
-            love.graphics.draw(o.image,o.x+o.ident+o.padding,o.y+o.padding,0,w/img:getWidth(),h/img:getHeight())
+            love.graphics.draw(o.image,o.x+o.indent+o.padding,o.y+o.padding,0,w/img:getWidth(),h/img:getHeight())
         end
         
         --draws borders
         love.graphics.setColor(o.bordercolor)
         love.graphics.setLineWidth(o.borderwidth)
-        love.graphics.rectangle('line',o.x+o.ident,o.y,w+o.padding*2,h+o.padding*2)
+        love.graphics.rectangle('line',o.x+o.indent,o.y,w+o.padding*2,h+o.padding*2)
         
         --draws the text
         love.graphics.setColor(o.color)
         if content~="" then
-            love.graphics.draw(text,o.x+(o.padding/2)+o.ident+o.contentident,o.y+(o.padding/2))
+            love.graphics.draw(text,o.x+(o.padding/2)+o.indent+o.contentindent,o.y+(o.padding/2))
         end
 
         --increments the coordinates according to the space the element took, to position following elements accordingly.
@@ -206,11 +206,11 @@ function renderElement(content,element,o,parent)
         w,h=text:getWidth(),text:getHeight()
         o.padding=0
         o.margin=0
-        o.ident=0
+        o.indent=0
         love.graphics.setColor(1,0,0)
         love.graphics.rectangle('fill',o.x,o.y,w+o.padding*3,h+o.padding*3)
         love.graphics.setColor(1,1,1)
-        love.graphics.draw(text,o.x+o.padding+o.ident,o.y+o.padding)
+        love.graphics.draw(text,o.x+o.padding+o.indent,o.y+o.padding)
     end)
     love.graphics.setCanvas()
     love.graphics.origin()

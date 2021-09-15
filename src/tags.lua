@@ -20,8 +20,8 @@ rootdefaults = {
     align = "left",
     padding = 0,
     margin = 0,
-    ident = 0,
-    contentident = 0,
+    indent = 0,
+    contentindent = 0,
     spacing = 0,
 
     direction = "down",
@@ -63,12 +63,12 @@ defaults = {
         block = "both",
         padding = 4,
         selectcolor = {0.3,0.3,1},
-        contentident = 0,
+        contentindent = 0,
     },
     linkkinappulat = {
         direction = "right",
         block = "vertical",
-        ident = 16,
+        indent = 16,
         bordercolor = {0,0,0,0},
         layer = true,
     },
@@ -82,7 +82,7 @@ defaults = {
         bgcolor = {0.9,0.9,1},
         width = function(element) return love.graphics.getWidth() end,
         x = 0,
-        contentident = 16,
+        contentindent = 16,
         bordercolor = {0,0,0,0},
         layer = true,
     },
@@ -106,7 +106,7 @@ defaults = {
         bordercolor = {0,0,0,0},
     },
     sisältö = {
-        contentident = 16,
+        contentindent = 16,
         bordercolor = {0,0,0,0},
     }
 }
